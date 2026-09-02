@@ -15,8 +15,24 @@
   box-sizing: border-box;
 }
 
-html {
-  scroll-behavior: smooth;
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }
 
 body {
@@ -378,10 +394,6 @@ a {
   width: max-content;
   animation: 26s linear infinite logo-marquee;
   display: flex;
-}
-
-.logo-marquee:hover .logo-marquee-track {
-  animation-play-state: paused;
 }
 
 .logo-marquee img {
@@ -1495,10 +1507,6 @@ a {
   transform: rotate(90deg);
 }
 
-.faq-item.open .faq-toggle i {
-  transform: rotate(0);
-}
-
 .faq-item > p {
   color: #5d5d5d;
   max-width: 580px;
@@ -2047,6 +2055,140 @@ a {
     left: 0;
     right: auto;
   }
+}
+
+.custom-cursor {
+  pointer-events: none;
+  z-index: 999999;
+  mix-blend-mode: normal;
+  background: #de322d;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  width: 10px;
+  height: 10px;
+  transition: width .35s cubic-bezier(.16, 1, .3, 1), height .35s cubic-bezier(.16, 1, .3, 1), background-color .2s;
+  display: flex;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+
+.custom-cursor.cursor-active {
+  background: #de322de6;
+  width: 48px;
+  height: 48px;
+}
+
+.custom-cursor.cursor-with-label {
+  background: #de322d;
+  width: 72px;
+  height: 72px;
+}
+
+.cursor-label {
+  letter-spacing: .5px;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0;
+  font-size: 10px;
+  font-weight: 700;
+  transition: opacity .2s, transform .2s;
+  transform: scale(.7);
+}
+
+.custom-cursor.cursor-with-label .cursor-label {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (pointer: coarse) {
+  .custom-cursor {
+    display: none !important;
+  }
+}
+
+.cta-button {
+  overflow: hidden;
+}
+
+.btn-content-block {
+  display: inline-flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-inner-default, .btn-inner-hover {
+  white-space: nowrap;
+  display: block;
+}
+
+.btn-inner-hover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+.trust-mark-star {
+  transform-origin: center;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  display: inline-flex;
+}
+
+.logo-marquee {
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.logo-marquee-track {
+  will-change: transform;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 64px;
+  padding-right: 64px;
+  animation: 22s linear infinite logo-scroll;
+  display: flex;
+}
+
+@keyframes logo-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.logo-marquee:hover .logo-marquee-track {
+  animation-play-state: paused;
+}
+
+.work-image-wrap {
+  position: relative;
+  overflow: hidden;
+}
+
+.gallery-card, .blog-image {
+  overflow: hidden;
+}
+
+.service-arrow {
+  transition: none;
+  display: inline-block;
+}
+
+.faq-item.open .faq-toggle i {
+  transform: rotate(45deg) !important;
+}
+
+.faq-toggle i {
+  transition: transform .35s cubic-bezier(.16, 1, .3, 1);
 }
 
 /*# sourceMappingURL=src_1j05wv_._.css.map*/

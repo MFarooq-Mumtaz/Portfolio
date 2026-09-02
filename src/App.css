@@ -2015,3 +2015,155 @@
     left: 0;
   }
 }
+
+/* ==========================================================================
+   STODIO EXACT ANIMATION EXTENSIONS
+   ========================================================================== */
+
+/* ----- Custom Cursor ----- */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 10px;
+  height: 10px;
+  background: #DE322D;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999999;
+  transform: translate(-50%, -50%);
+  transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              height 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  mix-blend-mode: normal;
+}
+
+.custom-cursor.cursor-active {
+  width: 48px;
+  height: 48px;
+  background: rgba(222, 50, 45, 0.9);
+}
+
+.custom-cursor.cursor-with-label {
+  width: 72px;
+  height: 72px;
+  background: #DE322D;
+}
+
+.cursor-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #fff;
+  opacity: 0;
+  transform: scale(0.7);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.custom-cursor.cursor-with-label .cursor-label {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (pointer: coarse) {
+  .custom-cursor { display: none !important; }
+}
+
+/* ----- Rolling Button Text Effect (Stodio signature) -----
+   Structure: .cta-button > .btn-content-block > (.btn-inner-default + .btn-inner-hover)
+   On hover: default slides up (-100%), hover slides in from 100% → 0%
+*/
+.cta-button {
+  overflow: hidden;
+}
+
+.btn-content-block {
+  position: relative;
+  display: inline-flex;
+  overflow: hidden;
+}
+
+.btn-inner-default,
+.btn-inner-hover {
+  display: block;
+  white-space: nowrap;
+}
+
+.btn-inner-hover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+}
+
+/* ----- Trust Mark Rotating Star (Stodio) ----- */
+.trust-mark-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transform-origin: center;
+}
+
+/* ----- Seamless Logo Marquee (Stodio: two duplicated tracks) ----- */
+.logo-marquee {
+  display: flex;
+  overflow: hidden;
+  position: relative;
+}
+
+.logo-marquee-track {
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  padding-right: 64px;
+  flex-shrink: 0;
+  animation: logo-scroll 22s linear infinite;
+  will-change: transform;
+}
+
+@keyframes logo-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+.logo-marquee:hover .logo-marquee-track {
+  animation-play-state: paused;
+}
+
+/* ----- Work card hover overlay ----- */
+.work-image-wrap {
+  overflow: hidden;
+  position: relative;
+}
+
+/* ----- Gallery image hover ----- */
+.gallery-card {
+  overflow: hidden;
+}
+
+/* ----- Blog image hover ----- */
+.blog-image {
+  overflow: hidden;
+}
+
+/* ----- Service arrow hover ----- */
+.service-arrow {
+  display: inline-block;
+  transition: none; /* managed by GSAP */
+}
+
+/* ----- FAQ open icon rotate ----- */
+.faq-item.open .faq-toggle i {
+  transform: rotate(45deg) !important;
+}
+
+.faq-toggle i {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+

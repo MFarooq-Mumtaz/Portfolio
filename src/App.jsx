@@ -7,6 +7,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 gsap.registerPlugin(ScrollTrigger)
 
+// Stodio exact easing curve
+const EASE_STODIO = 'cubic-bezier(0.16, 1, 0.3, 1)'
+
 const imgImageHeroBgImage = 'https://www.figma.com/api/mcp/asset/7aa0cd78-0ec8-43eb-982b-833a11cde88e.png'
 const imgVector = 'https://www.figma.com/api/mcp/asset/ee49d2f0-2198-4139-9f5d-12fb724f113a.png'
 const imgContainer = 'https://www.figma.com/api/mcp/asset/28d31aef-3947-4bea-a8d8-98170c7b2903.png'
@@ -219,159 +222,292 @@ function App() {
 
     if (!root) return undefined
 
+    // ==============================================================
+    // STODIO EXACT ANIMATION SYSTEM
+    // Each element starts at: opacity:0, filter:blur(5px), translate3d(0,50px,0)
+    // Animates to: opacity:1, filter:blur(0), translate3d(0,0,0)
+    // ==============================================================
     const context = gsap.context(() => {
-      const reveal = (targets, vars = {}) => {
-        gsap.from(targets, {
-          autoAlpha: 0,
-          y: 48,
-          duration: 1,
-          ease: 'power3.out',
-          stagger: 0.08,
-          scrollTrigger: {
-            trigger: targets,
-            start: 'top 86%',
-            once: true,
-          },
-          ...vars,
-        })
+
+      if (reducedMotion) return
+
+      // Shared reveal function — matches Stodio's scroll trigger pattern exactly
+      const reveal = (targets, fromVars = {}, extraVars = {}) => {
+        const defaultFrom = { autoAlpha: 0, filter: 'blur(5px)', y: 50 }
+        const defaultTo = {
+          autoAlpha: 1, filter: 'blur(0px)', y: 0,
+          duration: 0.9, ease: 'power3.out', stagger: 0.1,
+          scrollTrigger: { trigger: targets, start: 'top 88%', once: true },
+        }
+        gsap.fromTo(targets, { ...defaultFrom, ...fromVars }, { ...defaultTo, ...extraVars })
       }
 
-      if (reducedMotion) {
-        gsap.set(root.querySelectorAll('[data-motion]'), { clearProps: 'all' })
-        return
-      }
+      // ---- HERO SECTION ----
+      // Hero bg image: scale 1.4 → 1 (exact Stodio inline style shows scale3d(1.4,1.4,1))
+      const heroTl = gsap.timeline()
+      heroTl
+        .fromTo('.hero-bg img',
+          { scale: 1.4, transformOrigin: 'center center' },
+          { scale: 1.0, duration: 1.8, ease: 'power2.out' }
+        )
+        // Topbar fades in from top
+        .fromTo('.topbar',
+          { autoAlpha: 0, y: -20 },
+          { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power3.out' },
+          '-=1.2'
+        )
+        // Badge: blur + y50 (exact Stodio initial inline style)
+        .fromTo('.headline-badge',
+          { autoAlpha: 0, filter: 'blur(5px)', y: 50 },
+          { autoAlpha: 1, filter: 'blur(0px)', y: 0, duration: 0.7, ease: 'power3.out' },
+          '-=0.4'
+        )
+        // Hero title: blur + y50
+        .fromTo('.hero-line-inner',
+          { autoAlpha: 0, filter: 'blur(5px)', y: 50 },
+          { autoAlpha: 1, filter: 'blur(0px)', y: 0, duration: 0.9, stagger: 0.1, ease: 'power3.out' },
+          '-=0.35'
+        )
+        // Hero subtitle: blur + y50
+        .fromTo('.hero-subtitle',
+          { autoAlpha: 0, filter: 'blur(5px)', y: 50 },
+          { autoAlpha: 1, filter: 'blur(0px)', y: 0, duration: 0.7, ease: 'power3.out' },
+          '-=0.5'
+        )
+        // Hero meta row tags
+        .fromTo('.hero-meta-row span',
+          { autoAlpha: 0, filter: 'blur(5px)', y: 50 },
+          { autoAlpha: 1, filter: 'blur(0px)', y: 0, duration: 0.6, stagger: 0.08, ease: 'power3.out' },
+          '-=0.4'
+        )
+        // Hero aside content
+        .fromTo('.hero-aside',
+          { autoAlpha: 0, filter: 'blur(5px)', y: 50 },
+          { autoAlpha: 1, filter: 'blur(0px)', y: 0, duration: 0.7, ease: 'power3.out' },
+          '-=0.3'
+        )
 
-      const heroTimeline = gsap.timeline({ defaults: { ease: 'power3.out' } })
-      heroTimeline
-        .from('.hero-bg img', { scale: 1.08, duration: 1.6, ease: 'power2.out' })
-        .from('.topbar', { autoAlpha: 0, y: -20, duration: 0.7 }, '-=1.1')
-        .from('.headline-badge', { autoAlpha: 0, y: 24, duration: 0.7 }, '-=0.35')
-        .from('.hero-line-inner', { yPercent: 115, duration: 1, stagger: 0.08 }, '-=0.35')
-        .from('.hero-subtitle', { autoAlpha: 0, y: 24, duration: 0.65 }, '-=0.55')
-        .from('.hero-meta-row span', { autoAlpha: 0, y: 18, duration: 0.55, stagger: 0.08 }, '-=0.35')
-        .from('.hero-aside', { autoAlpha: 0, y: 32, duration: 0.75 }, '-=0.25')
-
+      // Hero BG parallax scrub on scroll
       gsap.to('.hero-bg img', {
-        yPercent: 8,
+        yPercent: 15,
         ease: 'none',
         scrollTrigger: { trigger: '.hero-shell', start: 'top top', end: 'bottom top', scrub: true },
       })
 
-      gsap.to('.hero-bg img', { scale: 1.05, duration: 12, repeat: -1, yoyo: true, ease: 'sine.inOut' })
+      // ---- BUTTON ROLLING TEXT HOVER EFFECT ----
+      // Matches Stodio: .button-inner (default) slides up on hover, .button-inner.absolute slides in from below
+      root.querySelectorAll('.cta-button, .about-link, .all-cases, .view-blogs').forEach((btn) => {
+        const inner = btn.querySelector('.btn-inner-default')
+        const abs = btn.querySelector('.btn-inner-hover')
+        const arrowEl = btn.querySelector('.arrow-icon')
+        if (!inner || !abs) return
 
-      reveal('.trust-strip')
-      reveal('.about-section')
-      reveal('.gallery-card', { y: 60, stagger: 0.08 })
-      reveal('.stats-section')
-      reveal('.services-panel .section-heading-row')
-      reveal('.service-row', { x: -32, y: 0, stagger: 0.1 })
-      reveal('.showcase-header')
-      reveal('.work-card', { y: 60, stagger: 0.12 })
-      reveal('.pricing-header')
-      reveal('.plan-card', { y: 50, stagger: 0.14 })
-      reveal('.faq-heading > div:first-child')
-      reveal('.faq-item', { x: 32, y: 0, stagger: 0.08 })
-      reveal('.testimonials-heading')
-      reveal('.testimonial-card', { y: 54, stagger: 0.12 })
-      reveal('.journal-heading')
-      reveal('.blog-card', { y: 54, stagger: 0.12 })
-      reveal('.footer-callout', { scale: 0.97, y: 24 })
-      reveal('.site-footer', { y: 36 })
+        const tl = gsap.timeline({ paused: true })
+        tl
+          .to(inner, { yPercent: -100, duration: 0.45, ease: EASE_STODIO }, 0)
+          .fromTo(abs, { yPercent: 100 }, { yPercent: 0, duration: 0.45, ease: EASE_STODIO }, 0)
+        if (arrowEl) {
+          tl.to(arrowEl, { x: 4, y: -4, duration: 0.35, ease: EASE_STODIO }, 0)
+        }
 
-      gsap.utils.toArray('.work-image-wrap').forEach((imageWrap) => {
-        gsap.fromTo(imageWrap, { clipPath: 'inset(12% 0 12% 0)' }, {
-          clipPath: 'inset(0% 0 0% 0)',
-          duration: 1.1,
-          ease: 'power4.out',
-          scrollTrigger: { trigger: imageWrap, start: 'top 88%', once: true },
-        })
-        gsap.fromTo(imageWrap.querySelector('img'), { scale: 1.1 }, {
-          scale: 1,
-          duration: 1.2,
-          ease: 'power4.out',
-          scrollTrigger: { trigger: imageWrap, start: 'top 88%', once: true },
-        })
+        btn.addEventListener('mouseenter', () => tl.play())
+        btn.addEventListener('mouseleave', () => tl.reverse())
       })
 
-      gsap.to('.gallery-track', {
-        xPercent: -24,
+      // ---- TRUST STRIP / MARQUEE SECTION ----
+      reveal('.trust-strip', {}, { duration: 0.7 })
+
+      // Marquee star icon rotates on scroll (Stodio: rotateZ driven by scroll)
+      gsap.to('.trust-mark-star', {
+        rotation: 360,
         ease: 'none',
-        scrollTrigger: { trigger: '.gallery-section', start: 'top bottom', end: 'bottom top', scrub: true },
+        scrollTrigger: { trigger: '.trust-strip', start: 'top bottom', end: 'bottom top', scrub: 1 },
       })
 
-      gsap.utils.toArray('.stat-value').forEach((value) => {
-        const target = value.dataset.value
-        const number = Number.parseInt(target, 10)
-        if (Number.isNaN(number)) return
-        const counter = { value: 0 }
-        gsap.to(counter, {
-          value: number,
-          duration: 1.8,
+      // ---- ABOUT / GALLERY SECTION ----
+      reveal('.about-section', {}, { stagger: 0 })
+
+      // Gallery: Stodio uses a CSS animation loop, we add a scroll-driven scrub parallax
+      gsap.to('.gallery-track', {
+        xPercent: -20,
+        ease: 'none',
+        scrollTrigger: { trigger: '.gallery-section', start: 'top bottom', end: 'bottom top', scrub: 1.5 },
+      })
+
+      // Gallery images zoom on hover (via CSS, but GSAP can enhance)
+      root.querySelectorAll('.gallery-card img').forEach((img) => {
+        const parent = img.closest('.gallery-card')
+        parent.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.06, duration: 0.6, ease: 'power2.out' }))
+        parent.addEventListener('mouseleave', () => gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' }))
+      })
+
+      // ---- STATS / COUNTER SECTION ----
+      // Stodio uses vertical odometer-style digit columns that slide from 0→ final position
+      // Each .about-us-counter-wrapper fades in: opacity:0, blur(5px), y:50
+      reveal('.stats-section', {}, { stagger: 0 })
+      reveal('.stat-item', { y: 50, filter: 'blur(5px)' }, { stagger: 0.12 })
+
+      // Counter number count-up animation
+      root.querySelectorAll('.stat-value').forEach((el) => {
+        const rawVal = el.dataset.value || el.textContent
+        const num = Number.parseInt(rawVal, 10)
+        if (Number.isNaN(num)) return
+        const obj = { v: 0 }
+        const suffix = rawVal.includes('%') ? '%' : rawVal.includes('+') ? '+' : ''
+        gsap.to(obj, {
+          v: num,
+          duration: 2.2,
           ease: 'power2.out',
-          scrollTrigger: { trigger: value, start: 'top 82%', once: true },
-          onUpdate: () => {
-            value.textContent = `${Math.round(counter.value)}${target.includes('%') ? '%' : target.includes('+') ? '+' : ''}`
-          },
+          scrollTrigger: { trigger: el, start: 'top 85%', once: true },
+          onUpdate() { el.textContent = `${Math.round(obj.v)}${suffix}` },
         })
       })
+
+      // ---- SERVICES SECTION ----
+      reveal('.services-panel .section-heading-row', {}, { stagger: 0 })
+      // Service rows slide in from left: x:-32 (Stodio's data-w-id initial style shows translate3d(-32px,0,0))
+      gsap.fromTo('.service-row',
+        { autoAlpha: 0, x: -32 },
+        {
+          autoAlpha: 1, x: 0,
+          duration: 0.7, ease: 'power3.out', stagger: 0.1,
+          scrollTrigger: { trigger: '.service-list', start: 'top 85%', once: true },
+        }
+      )
+
+      // Service rows: arrow slide on hover
+      root.querySelectorAll('.service-row').forEach((row) => {
+        const arrow = row.querySelector('.service-arrow')
+        row.addEventListener('mouseenter', () => {
+          if (arrow) gsap.to(arrow, { x: 8, duration: 0.3, ease: 'power2.out' })
+        })
+        row.addEventListener('mouseleave', () => {
+          if (arrow) gsap.to(arrow, { x: 0, duration: 0.3, ease: 'power2.out' })
+        })
+      })
+
+      // ---- WORK / PROJECTS SECTION ----
+      reveal('.showcase-header', {}, { stagger: 0 })
+
+      // Project cards: clip-path reveal from inset(12% 0) → inset(0) + inner img scale 1.1→1
+      root.querySelectorAll('.work-image-wrap').forEach((wrap) => {
+        const img = wrap.querySelector('img')
+        gsap.fromTo(wrap,
+          { clipPath: 'inset(12% 0 12% 0)' },
+          { clipPath: 'inset(0% 0 0% 0)', duration: 1.2, ease: 'power4.out', scrollTrigger: { trigger: wrap, start: 'top 88%', once: true } }
+        )
+        if (img) {
+          gsap.fromTo(img, { scale: 1.12 }, { scale: 1, duration: 1.3, ease: 'power4.out', scrollTrigger: { trigger: wrap, start: 'top 88%', once: true } })
+          // Hover zoom on project images
+          wrap.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.06, duration: 0.7, ease: 'power2.out' }))
+          wrap.addEventListener('mouseleave', () => gsap.to(img, { scale: 1, duration: 0.7, ease: 'power2.out' }))
+        }
+      })
+
+      // ---- PRICING SECTION ----
+      reveal('.pricing-header', {}, { stagger: 0 })
+      reveal('.plan-card', { y: 50, filter: 'blur(5px)' }, { stagger: 0.14 })
+
+      // Plan card hover lift
+      root.querySelectorAll('.plan-card').forEach((card) => {
+        card.addEventListener('mouseenter', () => gsap.to(card, { y: -6, duration: 0.4, ease: 'power2.out' }))
+        card.addEventListener('mouseleave', () => gsap.to(card, { y: 0, duration: 0.4, ease: 'power2.out' }))
+      })
+
+      // ---- FAQ SECTION ----
+      reveal('.faq-heading > div:first-child', {}, { stagger: 0 })
+      // FAQ items slide in from right (Stodio: x:32 initial)
+      gsap.fromTo('.faq-item',
+        { autoAlpha: 0, x: 32 },
+        {
+          autoAlpha: 1, x: 0,
+          duration: 0.7, ease: 'power3.out', stagger: 0.08,
+          scrollTrigger: { trigger: '.faq-list', start: 'top 87%', once: true },
+        }
+      )
+
+      // ---- TESTIMONIALS SECTION ----
+      reveal('.testimonials-heading', {}, { stagger: 0 })
+      reveal('.testimonial-card', { y: 54, filter: 'blur(5px)' }, { stagger: 0.12 })
+
+      // ---- JOURNAL / BLOG SECTION ----
+      reveal('.journal-heading', {}, { stagger: 0 })
+      reveal('.blog-card', { y: 54, filter: 'blur(5px)' }, { stagger: 0.12 })
+
+      // Blog card image zoom on hover
+      root.querySelectorAll('.blog-image img').forEach((img) => {
+        const parent = img.closest('.blog-card')
+        parent.addEventListener('mouseenter', () => gsap.to(img, { scale: 1.06, duration: 0.6, ease: 'power2.out' }))
+        parent.addEventListener('mouseleave', () => gsap.to(img, { scale: 1, duration: 0.6, ease: 'power2.out' }))
+      })
+
+      // ---- FOOTER CTA & FOOTER ----
+      reveal('.footer-callout', { scale: 0.97, y: 30, filter: 'blur(5px)' }, { stagger: 0 })
+      reveal('.site-footer', { y: 36 }, { stagger: 0 })
 
     }, root)
 
     if (reducedMotion) return () => context.revert()
 
-    const lenis = new Lenis({ lerp: 0.08, autoRaf: false })
-    let frameId
-    const update = (time) => {
-      lenis.raf(time)
-      ScrollTrigger.update()
-      frameId = requestAnimationFrame(update)
-    }
-    frameId = requestAnimationFrame(update)
+    // Lenis smooth scroll with GSAP ticker sync (exact Stodio pattern)
+    const lenis = new Lenis({
+      lerp: 0.08,
+      smoothWheel: true,
+      autoRaf: false,
+    })
+
+    lenis.on('scroll', ScrollTrigger.update)
+    gsap.ticker.add((time) => lenis.raf(time * 1000))
+    gsap.ticker.lagSmoothing(0)
 
     return () => {
-      cancelAnimationFrame(frameId)
       lenis.destroy()
       context.revert()
     }
   }, [])
 
+  // ==============================================================
+  // STODIO MAGNETIC CURSOR
+  // Small red dot (10px) → expands to 48px + label on hover
+  // ==============================================================
   useEffect(() => {
-    const root = appRef.current
     const cursor = cursorRef.current
     const cursorLabel = cursorLabelRef.current
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const touchDevice = window.matchMedia('(pointer: coarse)').matches
+    if (!cursor || !cursorLabel || touchDevice) return undefined
 
-    if (!root || !cursor || !cursorLabel || reducedMotion || touchDevice) return undefined
+    // Hide default cursor
+    document.body.style.cursor = 'none'
 
-    const moveX = gsap.quickTo(cursor, 'x', { duration: 0.25, ease: 'power3.out' })
-    const moveY = gsap.quickTo(cursor, 'y', { duration: 0.25, ease: 'power3.out' })
-    const handlePointerMove = (event) => {
-      moveX(event.clientX)
-      moveY(event.clientY)
-    }
-    const interactive = root.querySelectorAll('button, a, [data-cursor]')
-    const enter = (event) => {
+    const moveX = gsap.quickTo(cursor, 'x', { duration: 0.18, ease: 'power3.out' })
+    const moveY = gsap.quickTo(cursor, 'y', { duration: 0.18, ease: 'power3.out' })
+
+    const onMove = (e) => { moveX(e.clientX); moveY(e.clientY) }
+    window.addEventListener('pointermove', onMove)
+
+    const root = appRef.current
+    if (!root) return () => { window.removeEventListener('pointermove', onMove); document.body.style.cursor = '' }
+
+    const interactive = root.querySelectorAll('a, button, [data-cursor]')
+    const onEnter = (e) => {
+      const label = e.currentTarget.dataset.cursor || ''
       cursor.classList.add('cursor-active')
-      cursorLabel.textContent = event.currentTarget.dataset.cursor || 'VIEW'
+      if (label) {
+        cursor.classList.add('cursor-with-label')
+        cursorLabel.textContent = label
+      }
     }
-    const leave = () => {
-      cursor.classList.remove('cursor-active')
+    const onLeave = () => {
+      cursor.classList.remove('cursor-active', 'cursor-with-label')
       cursorLabel.textContent = ''
     }
 
-    window.addEventListener('pointermove', handlePointerMove)
-    interactive.forEach((element) => {
-      element.addEventListener('pointerenter', enter)
-      element.addEventListener('pointerleave', leave)
-    })
+    interactive.forEach((el) => { el.addEventListener('pointerenter', onEnter); el.addEventListener('pointerleave', onLeave) })
 
     return () => {
-      window.removeEventListener('pointermove', handlePointerMove)
-      interactive.forEach((element) => {
-        element.removeEventListener('pointerenter', enter)
-        element.removeEventListener('pointerleave', leave)
-      })
+      window.removeEventListener('pointermove', onMove)
+      document.body.style.cursor = ''
+      interactive.forEach((el) => { el.removeEventListener('pointerenter', onEnter); el.removeEventListener('pointerleave', onLeave) })
     }
   }, [])
 
@@ -385,7 +521,7 @@ function App() {
         </div>
       )}
       <div className="custom-cursor" ref={cursorRef} aria-hidden="true">
-        <span ref={cursorLabelRef} />
+        <span className="cursor-label" ref={cursorLabelRef} />
       </div>
       <div className="hero-shell">
         <div className="hero-bg">
@@ -418,7 +554,10 @@ function App() {
             <span className="cta-icon">
               <img src={imgVector} alt="" />
             </span>
-            <span>Book a call</span>
+            <span className="btn-content-block">
+              <span className="btn-inner-default">Book a call</span>
+              <span className="btn-inner-hover" aria-hidden="true">Book a call</span>
+            </span>
           </a>
         </header>
 
@@ -450,14 +589,20 @@ function App() {
 
             <div className="hero-actions">
               <a href="/projects" className="cta-button red-cta">
-                <span>View Projects</span>
+                <span className="btn-content-block">
+                  <span className="btn-inner-default">View Projects</span>
+                  <span className="btn-inner-hover" aria-hidden="true">View Projects</span>
+                </span>
                 <span className="arrow-icon">
                   <img src={imgImage} alt="" />
                 </span>
               </a>
 
               <a href="/contact" className="cta-button white-cta">
-                <span>Reach Out</span>
+                <span className="btn-content-block">
+                  <span className="btn-inner-default">Reach Out</span>
+                  <span className="btn-inner-hover" aria-hidden="true">Reach Out</span>
+                </span>
                 <span className="arrow-icon">
                   <img src={imgImage1} alt="" />
                 </span>
@@ -468,10 +613,20 @@ function App() {
       </div>
 
       <section className="trust-strip">
-        <div className="trust-note"><span className="trust-mark">✳</span><span>We’ve done 500+ enterprise and business consulting.</span></div>
+        <div className="trust-note">
+          <span className="trust-mark-star" aria-hidden="true">
+            <svg width="24" height="24" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M22.7428 13.2871C22.2703 9.23848 21.7715 4.96373 21.7715 0H26.2285C26.2285 4.90798 25.7321 9.17729 25.2602 13.2305C24.8759 16.5336 24.5082 19.6932 24.4399 22.938C26.6779 20.6036 28.6356 18.1284 30.6864 15.5356C33.2149 12.3388 35.8852 8.96334 39.3948 5.45357L42.5465 8.60525C39.076 12.0757 35.7056 14.7433 32.5061 17.2759L32.5031 17.2782C29.8969 19.3414 27.4038 21.3149 25.062 23.5601C28.2948 23.4918 31.4293 23.126 34.7126 22.7429C38.7613 22.2703 43.0363 21.7715 48 21.7715V26.2285C43.0922 26.2285 38.8229 25.7318 34.7699 25.2602L34.7669 25.26C31.4645 24.8758 28.3058 24.5083 25.062 24.4399C27.3948 26.6762 29.8687 28.6331 32.4599 30.6824L32.464 30.6859C35.6609 33.2147 39.0365 35.8847 42.5465 39.3948L39.3948 42.5465C35.9243 39.0761 33.2568 35.706 30.7246 32.5067L30.7186 32.4984L30.7135 32.4918C28.653 29.8897 26.6819 27.4006 24.4399 25.062C24.5082 28.3068 24.8759 31.4664 25.2602 34.7695C25.7321 38.8228 26.2285 43.092 26.2285 48H21.7715C21.7715 43.0363 22.2703 38.7616 22.7428 34.7129L22.7437 34.7063C23.1264 31.4252 23.4918 28.2926 23.5601 25.062C21.3181 27.4006 19.347 29.8897 17.2865 32.4918L17.2814 32.4984L17.2754 32.5067C14.7432 35.706 12.0757 39.0761 8.60525 42.5465L5.45357 39.3948C8.96351 35.8847 12.3391 33.2147 15.536 30.6859L15.5401 30.6824C18.1313 28.6331 20.6052 26.6762 22.938 24.4399C19.6932 24.5084 16.5335 24.876 13.2301 25.2602C9.17712 25.7318 4.90781 26.2285 0 26.2285V21.7715C4.96373 21.7715 9.23873 22.2703 13.2874 22.7429C16.5707 23.126 19.7052 23.4918 22.938 23.5601C20.5952 21.314 18.1012 19.3399 15.4939 17.2759C12.2944 14.7433 8.92399 12.0757 5.45357 8.60525L8.60525 5.45357C12.1148 8.96334 14.7851 12.3388 17.3136 15.5356C19.3644 18.1283 21.3221 20.6035 23.5601 22.9378C23.4918 19.7072 23.1264 16.5748 22.7437 13.2937L22.7428 13.2871Z" fill="#232323"/>
+            </svg>
+          </span>
+          <span>We've done 500+ enterprise and business consulting.</span>
+        </div>
         <div className="logo-marquee" aria-label="Studio partners">
           <div className="logo-marquee-track">
             {[imgPartner1, imgPartner2, imgPartner3, imgPartner4, imgPartner1, imgPartner2, imgPartner3, imgPartner4].map((logo, index) => <img key={`${logo}-${index}`} src={logo} alt="" />)}
+          </div>
+          <div className="logo-marquee-track" aria-hidden="true">
+            {[imgPartner1, imgPartner2, imgPartner3, imgPartner4, imgPartner1, imgPartner2, imgPartner3, imgPartner4].map((logo, index) => <img key={`dup-${logo}-${index}`} src={logo} alt="" />)}
           </div>
         </div>
       </section>
@@ -613,7 +768,10 @@ function App() {
               </ul>
 
               <a href={plan.href} className={`cta-button ${plan.accent ? 'red-cta' : 'dark-cta'}`}>
-                <span>{plan.cta}</span>
+                <span className="btn-content-block">
+                  <span className="btn-inner-default">{plan.cta}</span>
+                  <span className="btn-inner-hover" aria-hidden="true">{plan.cta}</span>
+                </span>
                 <span className="arrow-icon">
                   <img src={imgImage} alt="" />
                 </span>
@@ -713,7 +871,10 @@ function App() {
         <div className="footer-header">
           <h2>Transform Your Ideas Today</h2>
           <a href="/contact" className="cta-button red-cta large-footer-button">
-            <span>Book a Consultation</span>
+            <span className="btn-content-block">
+              <span className="btn-inner-default">Book a Consultation</span>
+              <span className="btn-inner-hover" aria-hidden="true">Book a Consultation</span>
+            </span>
             <span className="arrow-icon">
               <img src={imgImage1} alt="" />
             </span>
