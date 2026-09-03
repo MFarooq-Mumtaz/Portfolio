@@ -275,51 +275,56 @@ function App() {
         </header>
 
         <div className="hero-content">
-          <div className="headline-badge">
-            <span className="badge-icon">
-              <img src={imgIcon} alt="" width={16} height={16} />
-            </span>
-            <span>Next-Gen Design Agency</span>
+          <div className="hero-copy">
+            <div className="headline-badge">
+              <span className="badge-icon">
+                <img src={imgIcon} alt="" width={16} height={16} />
+              </span>
+              <span>Next-Gen Design Agency</span>
+            </div>
+
+            <h1>
+              <span className="hero-line"><span className="hero-line-inner">Designing the</span></span>
+              <span className="hero-line"><span className="hero-line-inner">Next Generation</span></span>
+              <span className="hero-line"><span className="hero-line-inner">of Brands</span></span>
+            </h1>
+
+            <p className="hero-subtitle">
+              Helping brands launch, grow, and stay ahead through exceptional design.
+            </p>
           </div>
 
-          <h1>
-            <span className="hero-line"><span className="hero-line-inner">Designing the Next Generation</span></span>
-            <span className="hero-line"><span className="hero-line-inner">of Brands</span></span>
-          </h1>
+          <div className="hero-bottom">
+            <div className="hero-meta-row">
+              <span>+ Define</span>
+              <span>+ est. YR2016</span>
+              <span>+ system: STODIO AGENCY</span>
+            </div>
 
-          <p className="hero-subtitle">
-            Helping brands launch, grow, and stay ahead through exceptional design.
-          </p>
+            <div className="hero-aside">
+              <p>Branding Mobile &amp; Web app design for startups and giants</p>
 
-          <div className="hero-meta-row">
-            <span>+ Define</span>
-            <span>+ est. YR2016</span>
-            <span>+ system: STODIO AGENCY</span>
-          </div>
+              <div className="hero-actions">
+                <a href="/projects" className="cta-button red-cta">
+                  <span className="btn-content-block">
+                    <span className="btn-inner-default">View Projects</span>
+                    <span className="btn-inner-hover" aria-hidden="true">View Projects</span>
+                  </span>
+                  <span className="arrow-icon">
+                    <img src={imgImage} alt="" width={14} height={16} />
+                  </span>
+                </a>
 
-          <div className="hero-aside">
-            <p>Branding, mobile &amp; web app design for startups and giants.</p>
-
-            <div className="hero-actions">
-              <a href="/projects" className="cta-button red-cta">
-                <span className="btn-content-block">
-                  <span className="btn-inner-default">View Projects</span>
-                  <span className="btn-inner-hover" aria-hidden="true">View Projects</span>
-                </span>
-                <span className="arrow-icon">
-                  <img src={imgImage} alt="" width={14} height={16} />
-                </span>
-              </a>
-
-              <a href="/contact" className="cta-button white-cta">
-                <span className="btn-content-block">
-                  <span className="btn-inner-default">Reach Out</span>
-                  <span className="btn-inner-hover" aria-hidden="true">Reach Out</span>
-                </span>
-                <span className="arrow-icon">
-                  <img src={imgImage1} alt="" width={14} height={16} />
-                </span>
-              </a>
+                <a href="/contact" className="cta-button white-cta">
+                  <span className="btn-content-block">
+                    <span className="btn-inner-default">Reach Out</span>
+                    <span className="btn-inner-hover" aria-hidden="true">Reach Out</span>
+                  </span>
+                  <span className="arrow-icon">
+                    <img src={imgImage1} alt="" width={14} height={16} />
+                  </span>
+                </a>
+              </div>
             </div>
           </div>
         </div>

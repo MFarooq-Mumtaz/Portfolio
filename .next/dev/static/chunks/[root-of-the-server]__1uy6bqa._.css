@@ -216,8 +216,10 @@ a {
 .hero-shell {
   background: #0a0a0acc;
   border-radius: 24px;
+  flex-direction: column;
   min-height: 930px;
   padding: 32px 24px 44px;
+  display: flex;
   position: relative;
   overflow: hidden;
 }
@@ -416,11 +418,28 @@ a {
 .hero-content {
   z-index: 2;
   flex-direction: column;
+  flex: 1;
+  justify-content: flex-end;
   align-items: flex-start;
+  width: 100%;
   max-width: 1504px;
-  padding: 128px 8px 0;
+  padding: 96px 8px 0;
   display: flex;
   position: relative;
+}
+
+.hero-copy {
+  width: 100%;
+  max-width: 680px;
+}
+
+.hero-bottom {
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 80px;
+  width: 100%;
+  padding-top: 80px;
+  display: flex;
 }
 
 .headline-badge, .section-badge {
@@ -455,11 +474,11 @@ a {
 }
 
 .hero-content h1 {
-  letter-spacing: -4.032px;
+  letter-spacing: -.042em;
   color: #fff;
   max-width: 680px;
   margin: 24px 0 0;
-  font-size: clamp(4.4rem, 5vw, 6rem);
+  font-size: 96px;
   font-weight: 500;
   line-height: 1.1;
   overflow: visible;
@@ -475,38 +494,44 @@ a {
 }
 
 .hero-subtitle {
-  letter-spacing: -.528px;
-  color: #f3f3f3cc;
+  letter-spacing: -.033em;
+  color: #f3f3f3;
   margin-top: 24px;
   font-size: 16px;
-  line-height: 25.6px;
+  line-height: 1.6;
 }
 
 .hero-meta-row {
-  color: #9d9d9de6;
-  letter-spacing: -.528px;
+  color: #9d9d9d;
+  max-width: 777px;
+  font-family: var(--font-geist-mono), "IBM Plex Mono", monospace;
+  letter-spacing: -.033em;
   text-transform: uppercase;
   flex-wrap: wrap;
-  gap: 28px;
-  margin-top: 80px;
+  flex: auto;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px 28px;
+  margin-top: 0;
   font-size: 18px;
-  line-height: 28.8px;
+  line-height: 1.6;
   display: flex;
 }
 
 .hero-aside {
   color: #fff;
+  flex: 0 440px;
   width: min(440px, 100%);
-  margin-top: 40px;
-  margin-left: auto;
+  margin-top: 0;
+  margin-left: 0;
 }
 
 .hero-aside p {
-  letter-spacing: -.992px;
+  letter-spacing: -.031em;
   max-width: 440px;
   margin: 0;
   font-size: 32px;
-  line-height: 40px;
+  line-height: 1.25;
 }
 
 .trust-strip {
@@ -1255,10 +1280,22 @@ a {
   }
 
   .hero-content {
-    padding-top: 96px;
+    padding-top: 64px;
+  }
+
+  .hero-content h1 {
+    font-size: 60px;
+  }
+
+  .hero-bottom {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 40px;
+    padding-top: 48px;
   }
 
   .hero-aside {
+    flex: auto;
     margin-left: 0;
   }
 
@@ -1292,8 +1329,13 @@ a {
   }
 
   .hero-content h1 {
-    font-size: 3.15rem;
-    line-height: .95;
+    font-size: 42px;
+    line-height: 1.1;
+  }
+
+  .hero-aside p {
+    font-size: 24px;
+    line-height: 1.25;
   }
 
   .service-heading-content h2, .pricing-header h2, .showcase-header h2, .footer-header h2 {
